@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+        integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container p-5">
+        <div class="card text-center">
+            <div class="card-header">
+                <h3 id="meta"></h3>
+            </div>
+            <div class="card-body">
+                <div class="row" id="data">
+                    <div class="col"></div>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                <nav aria-label="...">
+                    <ul id="pages" class="pagination pagination-sm justify-content-center">
+                        <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    </ul>
+                </nav>
+                <select class="form-select" aria-label="Default select example" id="per_pages">
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>6</option>
+                    <option>12</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+        crossorigin="anonymous"></script>
+    <script>
+        function DataFilter(page = 1, per_page = 6) {
+            $('#per_pages').val(per_page);
+            $.getJSON('https://reqres.in/api/users?page=' + page + '&per_page=' + per_page, function (jsonObject) {
+                $('#pages').empty();
+                $("#meta").html(
+                    'Her sayfada ' + jsonObject.per_page + ' kayıt bulunmaktadır.<br/>' +
+                    'Şu an ' + jsonObject.page + '. sayfadasınız.<br/>' +
+                    'Toplam sayfa sayısı ' + jsonObject.total_pages +
+                    ', toplam kayıt sayısı ise ' + jsonObject.total + ' adettir.'
+                );
+                for (let index = 1; index <= jsonObject.total_pages; index++) {
+                    if (jsonObject.page == index) {
+                        $('#pages').append('<li class="page-item active" aria-current="page"><span class="page-link">' + index + '</span></li>');
+                    } else {
+                        $('#pages').append('<li class="page-item"><span id="pager" class="page-link" style="cursor:pointer;">' + index + '</span></li>');
+                    }
+                }
+                $("#data").empty();
+                $.each(jsonObject.data, function (i, obj) {
+                    $("#data").append('<div class="col-lg 2 col-md-3 col-sm-6 pb-3"><div class="card h-100"><img src="' + obj.avatar + '" class="card-img-top" alt="..."><div class="card-body"><h5 class="card-title">' + obj.first_name + ' ' + obj.last_name + '</h5><p class="card-text"><a href="mailto:' + obj.email + '"><i class="fas fa-mail-bulk"></i></a></p></div></div></div>');
+                });
+            });
+        }
+        $(document).ready(function () {
+            DataFilter();
+            console.log('Başladık');
+            $(document).on('click', '#pager', function () {
+                DataFilter(page = $(this).text(), per_page = $('#per_pages').val());
+            });
+
+            $('#per_pages').change(function(){
+                DataFilter(page = 1, per_page = $('#per_pages').val());
+            });
+
+            $('#meta').click(function () {
+                console.log($('this'));
+            });
+        });
+    </script>
+</body>
+
+</html>
